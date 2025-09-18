@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FenixCall - Call Center Simulation</title>
+    <style>
+        /* Основные стили */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #FFB74D !important;
+            color: #4E342E !important;
+            padding: 40px !important;
+            margin: 0 !important;
+            min-height: 100vh !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            text-align: center !important;
+        }
+        
+        .container {
+            max-width: 600px !important;
+            margin: 0 auto !important;
+            background: transparent !important;
+            color: #4E342E !important;
+        }
+        
+        /* Заголовок */
+        header {
+            background-color: #5D4037;
+            color: white;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+            text-align: center;
+            margin-bottom: 0;
+        }
+        
+        /* Игровые экраны */
+        .game-screen {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 0 0 15px 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            min-height: 400px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .intro-screen {
+            text-align: center;
+            padding: 40px 20px;
+            border-radius: 0 0 15px 15px;
+        }
+        
+        .result-screen {
+            text-align: center;
+            padding: 30px;
+            border-radius: 0 0 15px 15px;
+        }
+        
+        /* Индикаторы */
+        .indicators {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: #F5E8D3;
+            border-radius: 12px;
+        }
+        
+        .indicator {
+            text-align: center;
+        }
+        
+        .indicator-value {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        /* Контейнер диалога */
+        .dialog-container {
+            background-color: #F5E8D3;
+            border: 2px solid #5D4037;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            min-height: 250px;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+        
+        /* Сообщения */
+        .message {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 15px;
+            max-width: 80%;
+            position: relative;
+        }
+        
+        .operator {
+            background-color: #184486 !important; 
+            color: white !important; 
+            margin: 10px 0 10px 20%;
+            border-radius: 15px 15px 0px 15px;
+            padding: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .client {
+            background-color: #F5E8D3 !important;
+            color: #4E342E !important;
+            margin: 10px 20% 10px 0;
+            border-radius: 15px 15px 15px 0px;
+            padding: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #5D4037;
+        }
+        
+        .system {
+            background-color: #8D6E63;
+            color: white;
+            text-align: center;
+            font-style: italic;
+            margin: 10px auto;
+            max-width: 90%;
+        }
+        
+        /* Индикатор настроения */
+        .mood-indicator {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            margin-left: 10px;
+            background-color: #5D4037;
+            color: white;
+        }
+        
+        .neugierig {
+            background-color: #3498db;
+        }
+        
+        .unglaeubig {
+            background-color: #f39c12;
+        }
+        
+        .genervt {
+            background-color: #e74c3c;
+        }
+        
+        /* Контейнер опций */
+        .options-container {
+            display: grid;
+            grid-gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        /* Кнопки выбора */
+        .choice-button {
+            background-color: #184486 !important;
+            color: white !important;
+            padding: 14px;
+            margin: 8px 0;
+            border-radius: 8px;
+            display: block;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: left;
+            transition: all 0.2s;
+        }
+        
+        .choice-button:hover {
+            background-color: #0d2f6b !important;
+            transform: translateY(-2px);
+        }
+        
+        /* Кнопки действий */
+        .action-btn {
+            padding: 14px 25px;
+            background-color: #5D4037;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            display: block;
+            margin: 20px auto;
+            transition: all 0.2s;
+        }
+        
+        .action-btn:hover {
+            background-color: #3E2723;
+            transform: translateY(-2px);
+        }
+        
+        /* Поле ввода */
+        .name-input {
+            padding: 12px;
+            width: 100%;
+            max-width: 300px;
+            margin: 20px 0;
+            border: 2px solid #5D4037;
+            border-radius: 8px;
+            background-color: #F5E8D3;
+            color: #4E342E;
+        }
+        
+        /* Отображение кода */
+        .code-display {
+            font-size: 2em;
+            letter-spacing: 5px;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #F5E8D3;
+            border-radius: 8px;
+            display: inline-block;
+            color: #4E342E;
+            border: 2px dashed #5D4037;
+        }
+        
+        /* Списки */
+        .tutorial-list {
+            text-align: left;
+            max-width: 500px;
+            margin: 0 auto 20px;
+            padding-left: 20px;
+        }
+        
+        .tutorial-list li {
+            margin-bottom: 12px;
+            list-style-type: none;
+            position: relative;
+            padding-left: 25px;
+        }
+        
+        .tutorial-list li:before {
+            content: "✅";
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        
+        /* Изменения доверия */
+        .trust-up {
+            color: #2ecc71;
+        }
+        
+        .trust-down {
+            color: #e74c3c;
+        }
+        
+        /* Скрытые элементы */
+        .hidden {
+            display: none;
+        }
+        
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .message {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        .highlight-code {
+            background-color: #8B0000 !important;
+            color: white !important;
+            padding: 2px 4px !important;
+            border-radius: 3px !important;
+            font-weight: bold !important;
+            letter-spacing: 5px;
+        }
+        
+        /* Call selection styles */
+        .call-selection {
+            text-align: center;
+        }
+        
+        .call-btn {
+            display: block;
+            width: 100%;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #5D4037;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .call-btn:hover {
+            background-color: #3E2723;
+        }
+        
+        .chapter-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #5D4037;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>FenixCall</h1>
+        </header>
+        
+        <div id="intro-screen" class="game-screen intro-screen">
+            <h2>Willkommen bei FenixCall!</h2>
+            <p>Dein erster Tag als Call-Center Operator! Deine Aufgabe ist es, Kunden von einer Liste anzurufen und basierend auf ihren Beschwerden das passende Produkt zu empfehlen.</p>
+            
+            <h3>Dein Werkzeug: Unser Sales-Skript</h3>
+            <ul class="tutorial-list">
+                <li>Absolvieren Sie die Anrufe erfolgreich.</li>
+                <li>Das Vertrauen den Kunden gewinnen.</li>
+                <li>Geheime Code sammeln und sich den Zugang zum Finale sichern!</li>
+            </ul>
+            
+            <p>Wende beim Spielen dein Wissen und das Gelernte aus den Schulungsmaterialien an.</p>
+            
+            <p>Gib deinen Namen ein, um zu beginnen:</p>
+            <input type="text" id="agent-name" class="name-input" placeholder="Dein Name">
+            <button id="start-btn" class="action-btn">Starten</button>
+        </div>
+        
+        <div id="call-selection" class="game-screen call-selection hidden">
+            <h2>Wählen Sie einen Anruf</h2>
+            <button id="call1-btn" class="call-btn">Anruf №1: E. Müller (Gelenkschmerzen)</button>
+            <button id="call2-btn" class="call-btn">Anruf №2: Anna Herbst (Gewichtsabnahme)</button>
+        </div>
+        
+        <div id="game-screen" class="game-screen hidden">
+            <div class="chapter-title" id="chapter-title">Anruf</div>
+            <div class="indicators">
+                <div class="indicator">
+                    <div>Vertrauen</div>
+                    <div id="trust-value" class="indicator-value">50</div>
+                </div>
+                <div class="indicator">
+                    <div>Verkäufe</div>
+                    <div id="sales-value" class="indicator-value">0</div>
+                </div>
+                <div class="indicator">
+                    <div>Kundentyp</div>
+                    <div id="mood-value" class="indicator-value">Neugierig</div>
+                </div>
+            </div>
+            
+            <div id="dialog-container" class="dialog-container">
+                <!-- Dialog content will be inserted here -->
+            </div>
+            
+            <div id="options-container" class="options-container">
+                <!-- Options will be inserted here -->
+            </div>
+            
+            <button id="next-btn" class="action-btn hidden">Weiter</button>
+            <button id="retry-btn" class="action-btn hidden">Noch einmal versuchen</button>
+        </div>
+        
+        <div id="result-screen" class="game-screen result-screen hidden">
+            <h2>Anruf erfolgreich abgeschlossen!</h2>
+            <p>Sie haben das Rollenspiel bei FenixCall erfolgreich abgeschlossen!</p>
+            <p>Ihre Ergebnisse berechtigen Sie zur Teilnahme am finalen Abschlusstest.</p>
+            
+            <p>Um Zugang zum Test zu erhalten, benötigen wir Ihren Bestätigungscode:</p>
+            <div class="code-display" id="final-code">Fenix-375</div>
+            
+            <button id="restart-btn" class="action-btn">Neuer Anruf</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state variables
+        let state = {
+            agentName: "",
+            Verkäufe: 0,
+            Vertrauen: 50,
+            Kundentyp: "Neugierig",
+            currentScene: "intro",
+            previousScenes: [],
+            knowsPregnant: false,
+            currentCall: null,
+            codes: []
+        };
+
+        // DOM elements
+        const introScreen = document.getElementById('intro-screen');
+        const callSelection = document.getElementById('call-selection');
+        const gameScreen = document.getElementById('game-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const agentNameInput = document.getElementById('agent-name');
+        const startBtn = document.getElementById('start-btn');
+        const call1Btn = document.getElementById('call1-btn');
+        const call2Btn = document.getElementById('call2-btn');
+        const chapterTitle = document.getElementById('chapter-title');
+        const trustValue = document.getElementById('trust-value');
+        const salesValue = document.getElementById('sales-value');
+        const moodValue = document.getElementById('mood-value');
+        const dialogContainer = document.getElementById('dialog-container');
+        const optionsContainer = document.getElementById('options-container');
+        const nextBtn = document.getElementById('next-btn');
+        const retryBtn = document.getElementById('retry-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const finalCode = document.getElementById('final-code');
+
+        // Scene definitions for E. Müller call
+        const muellerScenes = {
+            intro: {
+                text: "Anruf №1: Der Kunde E. Müller. Interesse: Gelenkschmerzen.",
+                options: [
+                    {
+                        text: "Guten Tag, ich rufe Sie wegen Ihrer Gelenkschmerzen an. Haben Sie 5-10 Minuten, um die Details zu besprechen?",
+                        next: "bad1",
+                        trustChange: -10
+                    },
+                    {
+                        text: "Guten Tag, Herr Müller! Mein Name ist [Name] von FenixCall. Sie haben kürzlich eine Anfrage auf unserer Website hinterlassen. Haben Sie vielleicht 5-10 Minuten, um die Details Ihrer Bestellung zu besprechen?",
+                        next: "good1",
+                        trustChange: 5
+                    },
+                    {
+                        text: "Hallo, hier ist [Name] von FenixCall. Wir haben da was gegen Gelenkschmerzen. Interessiert Sie das?",
+                        next: "bad2",
+                        trustChange: -15
+                    },
+                    {
+                        text: "Guten Tag, mein Name ist [Name]. Haben Sie kürzlich eine Anfrage auf unserer Website bezüglich Lösungen für Gelenkprobleme hinterlassen?",
+                        next: "bad3",
+                        trustChange: -10
+                    }
+                ]
+            },
+            bad1: {
+                text: {
+                    Neugierig: "Der Kunde: «Wie kommen Sie denn an meine Daten? Woher wissen Sie das?» *Click.*",
+                    Ungläubig: "Der Kunde: «Das kann nicht sein! Ich habe keine Anfrage hinterlassen!» *Click.*",
+                    Genervt: "Der Kunde: «Wieder diese lästigen Anrufe! Verschwinden Sie!» *Click.*"
+                },
+                type: "fail"
+            },
+            bad2: {
+                text: {
+                    Neugierig: "Der Kunde: «Nein, kein Interesse!» *Click.*",
+                    Ungläubig: "Der Kunde: «Das ist bestimmt wieder so ein Betrug!» *Click.*",
+                    Genervt: "Der Kunde: «Haben Sie nichts Besseres zu tun?» *Click.*"
+                },
+                type: "fail"
+            },
+            bad3: {
+                text: {
+                    Neugierig: "Der Kunde: «Äh... nein, habe ich nicht.» *Click.*",
+                    Ungläubig: "Der Kunde: «Das ist eine Frechheit! Ich habe nichts hinterlassen!» *Click.*",
+                    Genervt: "Der Kunde: «Lassen Sie mich in Ruhe!» *Click.*"
+                },
+                type: "fail"
+            },
+            good1: {
+                text: {
+                    Neugierig: "Der Kunde: Ja, gerne. Um welche Anfrage handelt es sich denn genau?",
+                    Ungläubig: "Der Kunde: Hmm, ich erinnere mich nicht genau. Was war das nochmal?",
+                    Genervt: "Der Kunde: Na gut, aber machen Sie es kurz!"
+                },
+                next: "scene2"
+            },
+            scene2: {
+                text: "Sie: 'Wie ich sehe, ging es damals um Gelenkschmerzen. Habe ich richtig verstanden, dass das Thema bei Ihnen immer noch aktuell ist?'",
+                customerResponse: {
+                    Neugierig: "Herr Müller: 'Ja, leider schon. Das rechte Knie macht mir oft zu schaffen.'",
+                    Ungläubig: "Herr Müller: 'Ja, aber woher wissen Sie das? Haben Sie meine Daten?'",
+                    Genervt: "Herr Müller: 'Ja, ja, das stimmt. Was wollen Sie denn jetzt?'"
+                },
+                options: [
+                    {
+                        text: "Haben Sie das schon einem Arzt gezeigt?",
+                        next: "fail4",
+                        trustChange: -10
+                    },
+                    {
+                        text: "Das tut mir leid zu hören. Was glauben Sie, woher das bei Ihnen kommen könnte? Vielleicht Sport, Beruf, oder eine alte Verletzung?",
+                        next: "scene3a",
+                        trustChange: 5
+                    },
+                    {
+                        text: "Ich verstehe. Und wie lange leiden Sie schon darunter?",
+                        next: "scene3b",
+                        trustChange: 5
+                    },
+                    {
+                        text: "Das klingt unangenehm. Aber dafür haben wir genau das richtige Mittel! Es ist sehr wirksam.",
+                        next: "scene3c",
+                        trustChange: -5
+                    }
+                ]
+            },
+            fail4: {
+                text: {
+                    Neugierig: "Herr Müller: «Ja, und? Ich dachte, dass Sie mir helfen können...» Click.",
+                    Ungläubig: "Herr Müller: «Was hat das mit meinem Problem zu tun?» Click.",
+                    Genervt: "Herr Müller: «Das geht Sie nichts an!» Click."
+                },
+                type: "fail"
+            },
+            scene3a: {
+                text: {
+                    Neugierig: "Herr Müller: 'Mmm… Die Probleme habe ich schon seit gut einem Jahr, aber in letzter Zeit wird es langsam schlimmer. Tja… und was das Gewichtheben bei der Arbeit betrifft - das ist sicher… Ja, ich denke, das liegt alles daran.'",
+                    Ungläubig: "Herr Müller: 'Nun ja, etwa ein Jahr. Aber was hat das mit Ihnen zu tun?'",
+                    Genervt: "Herr Müller: 'Seit einem Jahr. Jetzt kommen Sie schon zur Sache!'"
+                },
+                next: "scene3_followup"
+            },
+            scene3b: {
+                text: {
+                    Neugierig: "Herr Müller: 'Mmm… Die Probleme habe ich schon seit gut einem Jahr, aber in letzter Zeit wird es langsam schlimmer. Tja… und was das Gewichtheben bei der Arbeit betrifft - das ist sicher… Ja, ich denke, das liegt alles daran.'",
+                    Ungläubig: "Herr Müller: 'Das geht schon ein Jahr. Aber woher wissen Sie das alles?'",
+                    Genervt: "Herr Müller: 'Länger als ich es ertragen kann! Jetzt sagen Sie mir endlich, was Sie wollen!'"
+                },
+                next: "scene3_followup"
+            },
+            scene3_followup: {
+                text: {
+                    Neugierig: "Herr Müller: 'Und was ist Fenix-375?'",
+                    Ungläubig: "Herr Müller: 'Was ist dieses Fenix-375?'",
+                    Genervt: "Herr Müller: 'Was ist Fenix-375?'"
+                },
+                next: "productExplanation"
+            },
+            scene3c: {
+                text: {
+                    Neugierig: "Herr Müller: Ach ja? Das sagt mir aber jeder…Was ist denn bei Ihrem Mittel so besonders?",
+                    Ungläubig: "Herr Müller: Wirklich? Das höre ich oft. Was macht Ihr Mittel besser als alle anderen?",
+                    Genervt: "Herr Müller: Immer dasselbe Versprechen! Was ist daran so besonders?"
+                },
+                options: [
+                    {
+                        text: "Es enthält eine einzigartige Formel mit Beinwell und Arnika, die tief eindringt.",
+                        next: "fail5",
+                        trustChange: -5
+                    },
+                    {
+                        text: "Das ist berechtigte Skepsis, das verstehe ich. Vielleicht bin ich zu voreilig. Erzählen Sie mir doch bitte kurz: Was glauben Sie, woher die Schmerzen im Knie bei Ihnen kommen könnten?",
+                        next: "scene3c1",
+                        trustChange: 5
+                    }
+                ]
+            },
+            fail5: {
+                text: {
+                    Neugierig: "Herr Müller: «Ja, und? Ich dachte, dass Sie mir helfen können...» Click.",
+                    Ungläubig: "Herr Müller: «Das sagt jeder Hersteller!» Click.",
+                    Genervt: "Herr Müller: «Leere Versprechungen!» Click."
+                },
+                type: "fail"
+            },
+            scene3c1: {
+                text: {
+                    Neugierig: "Herr Müller: «Naja, wie gesagt, ich war früher Läufer und hebe oft schwere Sachen...»",
+                    Ungläubig: "Herr Müller: «Nun, ich habe früher Sport gemacht und arbeite körperlich...»",
+                    Genervt: "Herr Müller: «Wie ich schon sagte: Laufen und schweres Heben!»"
+                },
+                next: "scene3c1_followup"
+            },
+            scene3c1_followup: {
+                text: {
+                    Neugierig: "Herr Müller: 'Und was ist Fenix-375?'",
+                    Ungläubig: "Herr Müller: 'Was ist dieses Fenix-375?'",
+                    Genervt: "Herr Müller: 'Was ist Fenix-375?'"
+                },
+                next: "productExplanation"
+            },
+            productExplanation: {
+                text: "Sie: 'Das ist nicht der Produktname, das ist unsere interne Kategorie für solche Beschwerden. Das Gel heißt Artizynt. Genau für diese Art von belastungsbedingten Schmerzen durch Sport und Heben ist unser Artizynt-Gel entwickelt worden! Es wirkt direkt an der Ursache der Entzündung und hilft nicht nur, den Schmerz zu unterdrücken, sondern auch die Beweglichkeit zu verbessern.'",
+                options: [
+                    {
+                        text: "Der spezielle Komplex aus Beinwell und Arnika dringt tief ein, um die Entzündung direkt im überlasteten Gelenk zu hemmen. Pfefferminz- und Eukalyptusöl sorgen für eine sofortige, kühlende Linderung des Schmerzes. So bekämpfen Sie die Ursache und spüren sofort Erleichterung.",
+                        next: "success1",
+                        trustChange: 10
+                    },
+                    {
+                        text: "Eine Tube mit 50 ml kostet 15€. Bei zweimal täglicher Anwendung reicht das für 10 Tage.",
+                        next: "priceObjection",
+                        trustChange: -5
+                    },
+                    {
+                        text: "Es ist vollständig natürlich und enthält Beinwell, Arnika und Kräuteröle.",
+                        next: "naturalObjection",
+                        trustChange: -5
+                    }
+                ]
+            },
+            priceObjection: {
+                text: {
+                    Neugierig: "Herr Müller: «Hmm… Das sind ja fast 45 Euro im Monat. Das ist mir dann doch etwas zu teuer. Ich glaube, ich lasse es erstmal.»",
+                    Ungläubig: "Herr Müller: «45 Euro im Monat? Das ist ja happig! Da bleibe ich lieber bei meinem bisherigen Mittel.»",
+                    Genervt: "Herr Müller: «45 Euro? Das ist ja Wucher! Vergessen Sie es!»"
+                },
+                options: [
+                    {
+                        text: "Das ist in Ordnung. Vielen Dank für Ihre Zeit.",
+                        next: "fail6",
+                        trustChange: -5
+                    },
+                    {
+                        text: "Ich verstehe Ihre Bedenken. Darf ich kurz erklären, WARUM es so wirksam ist?",
+                        next: "effectivenessExplanation",
+                        trustChange: 5
+                    }
+                ]
+            },
+            naturalObjection: {
+                text: {
+                    Neugierig: "Herr Müller: 'Ja, das ist ja alles schön und gut mit der Natur... aber das sagt mir jeder. Ich brauche etwas, das wirkt. Vielen Dank für Ihre Zeit.'",
+                    Ungläubig: "Herr Müller: 'Natürlich heißt nicht immer wirksam. Ich brauche handfeste Beweise.'",
+                    Genervt: "Herr Müller: 'Natürlich? Das bedeutet gar nichts! Verschwenden Sie nicht meine Zeit!'"
+                },
+                type: "fail"
+            },
+            fail6: {
+                text: {
+                    Neugierig: "Herr Müller: «Alles Gute.» Click",
+                    Ungläubig: "Herr Müller: «Auf Wiedersehen.» Click",
+                    Genervt: "Herr Müller: «Endlich!» Click"
+                },
+                type: "fail"
+            },
+            effectivenessExplanation: {
+                text: {
+                    Neugierig: "Herr Müller: «Okay, ich höre. Was ist denn das Besondere? Und was ist Fenix-375?»",
+                    Ungläubig: "Herr Müller: «Na gut, erklären Sie es mir. Was ist das Besondere?»",
+                    Genervt: "Herr Müller: «Also gut, aber machen Sie schnell!»"
+                },
+                next: "effectivenessExplanation2"
+            },
+            effectivenessExplanation2: {
+                text: "Sie: Das ist nicht der Produktname, das ist unsere interne Kategorie für solche Beschwerden. Das Gel heißt Artizynt.",
+                options: [
+                    {
+                        text: "Das Besondere ist der Doppeleffekt: Die natürlichen Wirkstoffe wie Beinwell und Arnika wirken entzündungshemmend tief im Gelenk - also genau dort, wo Ihr Schmerz durch das Laufen und Heben entsteht. Gleichzeitig sorgen Pfefferminz- und Eukalyptusöl für eine sofortige, kühlende Schmerzlinderung an der Oberfläche. So greifen Sie die Ursache an und spüren sofort Erleichterung.",
+                        next: "success2",
+                        trustChange: 10
+                    },
+                    {
+                        text: "Andere Gele kühlen nur oberflächlich. Unser Gel hingegen dringt tiefer ein, um die Entzündungsursache Ihrer belastungsbedingten Schmerzen gezielt zu hemmen – und kühlt dabei sofort. Es wirkt also nicht nur kurzfristig.",
+                        next: "success2",
+                        trustChange: 10
+                    },
+                    {
+                        text: "Es ist ganz natürlich und hat viele gute Inhaltsstoffe.",
+                        next: "naturalObjection",
+                        trustChange: -5
+                    }
+                ]
+            },
+            success1: {
+                text: {
+                    Neugierig: "Herr Müller: 'Ach, endlich mal eine Erklärung, die Sinn ergibt! Dieses ständige nur-Kühlen bringt ja doch nichts. Das klingt wirklich vielversprechend. Wie wende ich das denn an? Einfach draufschmieren?'",
+                    Ungläubig: "Herr Müller: 'Hmm, das klingt tatsächlich plausibler als das, was ich bisher gehört habe. Wie wird es angewendet?'",
+                    Genervt: "Herr Müller: 'Na gut, das klingt vernünftig. Wie wende ich das an?'"
+                },
+                next: "success3"
+            },
+            success2: {
+                text: {
+                    Neugierig: "Herr Müller: 'Ach, endlich mal eine Erklärung, die Sinn ergibt! Dieses ständige nur-Kühlen bringt ja doch nichts. Das klingt wirklich vielversprechend. Wie wende ich das denn an? Einfach draufschmieren?'",
+                    Ungläubig: "Herr Müller: 'Interessant, das hört sich nach einem durchdachten Produkt an. Wie wird es angewendet?'",
+                    Genervt: "Herr Müller: 'Okay, das überzeugt mich. Wie wende ich es an?'"
+                },
+                next: "success3"
+            },
+            success3: {
+                text: "Sie: Ganz genau! Es ist ganz einfach: Sie tragen es zwei- bis dreimal täglich auf die saubere, trockene Haut auf und reiben es leicht ein, bis es eingezogen ist. Die 50-ml-Tube reicht für etwa 10 Tage…",
+                next: "success3_followup"
+            },
+            success3_followup: {
+                text: "Sie: Kann ich Ihnen eine Tube für 15 € direkt bestellen? Die Lieferung erfolgt kostenlos innerhalb von zwei Werktagen.",
+                next: "success4"
+            },
+            success4: {
+                text: {
+                    Neugierig: "Herr Müller: 'Kann ich auch drei Tuben auf einmal bestellen?'",
+                    Ungläubig: "Herr Müller: 'Wenn ich schon bestelle, dann gleich mehrere. Kann ich drei Tuben bekommen?'",
+                    Genervt: "Herr Müller: 'Dann bestellen Sie mir gleich drei Tuben!'"
+                },
+                next: "success5"
+            },
+            success5: {
+                text: "Sie: Aber natürlich, das ist sogar eine ausgezeichnete Idee! Gerne bestelle ich Ihnen drei Tuben unseres Artizynt-Gel. Dann sind Sie bestens versorgt und haben für den gesamten Behandlungszeitraum Ruhe.",
+                next: "success6"
+            },
+            success6: {
+                text: {
+                    Neugierig: "Herr Müller: 'Das klingt toll!'",
+                    Ungläubig: "Herr Müller: 'Gut, dann machen wir das.'",
+                    Genervt: "Herr Müller: 'Endlich! Dann erledigen Sie das.'"
+                },
+                next: "success7"
+            },
+            success7: {
+                text: "Sie: Zusammenfassend für Sie: Das sind drei Tuben Artizynt-Gel à 50 ml. Der Gesamtbetrag liegt bei 45 €. Da Sie mehr als 35 € bestellen, ist der Versand für Sie weiterhin kostenfrei. Die Lieferung erfolgt gebündelt in einem Paket an die von Ihnen hinterlegte Adresse. Sie erhalten alles voraussichtlich innerhalb von zwei Werktagen. Da unser Versandpartner das Paket nur persönlich aushändigen darf: Passt der Zeitraum für Sie?",
+                next: "success8"
+            },
+            success8: {
+                text: {
+                    Neugierig: "Herr Müller: 'Ja, das passt. Danke der Nachfrage!'",
+                    Ungläubig: "Herr Müller: 'Ja, das sollte klappen.'",
+                    Genervt: "Herr Müller: 'Ja, ja, passt schon.'"
+                },
+                next: "success9"
+            },
+            success9: {
+                text: "Sie: Kann ich die Bestellung für Sie so aufgeben?",
+                next: "success10"
+            },
+            success10: {
+                text: {
+                    Neugierig: "Herr Müller: 'Ja, genau so. Vielen Dank!'",
+                    Ungläubig: "Herr Müller: 'Ja, bitte erledigen Sie das.'",
+                    Genervt: "Herr Müller: 'Ja, tun Sie das.'"
+                },
+                next: "success11"
+            },
+            success11: {
+                text: "Sie: Sehr gerne! Die Bestellung ist raus. Ich wünsche Ihnen eine schnelle Besserung und einen guten Tag noch!",
+                next: "success12"
+            },
+            success12: {
+                text: {
+                    Neugierig: "Herr Müller: 'Gleichfalls. Auf Wiederhören!'",
+                    Ungläubig: "Herr Müller: 'Danke, Auf Wiederhören.'",
+                    Genervt: "Herr Müller: 'Endlich. Auf Wiederhören.'"
+                },
+                type: "success"
+            }
+        };
+
+        // Scene definitions for Anna Herbst call
+        // Hinweis: Die in diesem Quiz beschriebenen Anrufe sind fiktiv und wurden speziell für Schulungszwecke erstellt.
+        const herbstScenes = {
+            intro: {
+                text: "Anruf №2: Die Kundin Anna Herbst. Interesse: Gewichtsabnahme.",
+                options: [
+                    {
+                        text: "Guten Tag, Frau Herbst! Mein Name ist [Name] von FenixCall. Sie haben sich für Informationen zu Gewichtsmanagement interessiert. Haben Sie momentan Zeit für ein Gespräch?",
+                        next: "anna_response",
+                        trustChange: 5
+                    },
+                    {
+                        text: "Guten Tag, ich rufe Sie bezüglich Gewichtsabnahme an. Haben Sie Zeit?",
+                        next: "anna_response_bad",
+                        trustChange: -5
+                    },
+                    {
+                        text: "Frau Herbst, guten Tag! Ich melde mich wegen Ihres Interesses an Gewichtsmanagement. Ist jetzt ein guter Zeitpunkt für Sie?",
+                        next: "anna_response_neutral",
+                        trustChange: 2
+                    }
+                ]
+            },
+            anna_response: {
+                text: {
+                    Neugierig: "Anna Herbst: 'Ja, gerne. Ich suche tatsächlich nach einer Lösung für Gewichtsabnahme.'",
+                    Hartnaeckig: "Anna Herbst: 'Endlich! Ich brauche dringend etwas gegen mein Gewicht.'",
+                    Enttaeuscht: "Anna Herbst: 'Ja, aber ich habe schon so vieles versucht ohne Erfolg.'"
+                },
+                next: "ask_motivation"
+            },
+            anna_response_bad: {
+                text: {
+                    Neugierig: "Anna Herbst: 'Äh, ja... aber woher haben Sie meine Daten?'",
+                    Hartnaeckig: "Anna Herbst: 'Was wollen Sie verkaufen? Ich habe keine Zeit für Werbung!'",
+                    Enttaeuscht: "Anna Herbst: 'Nicht schon wieder solche Anrufe...'"
+                },
+                type: "fail"
+            },
+            anna_response_neutral: {
+                text: {
+                    Neugierig: "Anna Herbst: 'Ja, moment passt es. Worum geht es genau?'",
+                    Hartnaeckig: "Anna Herbst: 'Na gut, aber machen Sie es kurz. Was bieten Sie an?'",
+                    Enttaeuscht: "Anna Herbst: 'Können Sie mir einfach die Informationen per Mail schicken?'"
+                },
+                next: "ask_motivation",
+                trustChange: 0
+            },
+            ask_motivation: {
+                text: "Sie: 'Vielen Dank für Ihre Zeit. Um Ihnen die bestmögliche Beratung bieten zu können, würde es mir helfen zu verstehen, was Ihre Motivation für die Gewichtsabnahme ist und seit wann Sie damit beschäftigt sind.'",
+                customerResponse: {
+                    Neugierig: "Anna Herbst: 'Nun, seit etwa einem Jahr nehme ich kontinuierlich zu. Es begann nach einer stressigen Phase im Job, und jetzt in der Schwangerschaft wird es noch schwieriger.'",
+                    Hartnaeckig: "Anna Herbst: 'Seit der Schwangerschaft vor drei Monaten geht es bergauf. Ich will nicht noch mehr zunehmen, aber es fällt mir so schwer!'",
+                    Enttaeuscht: "Anna Herbst: 'Seit ich schwanger bin - ich bin im dritten Monat - nehme ich ständig zu. Aber nichts scheint zu helfen, und ich fühle mich so unattraktiv.'"
+                },
+                next: "pregnancy_reaction"
+            },
+            pregnancy_reaction: {
+                text: "Anna Herbst hat erwähnt, dass sie schwanger ist. Wie reagieren Sie?",
+                options: [
+                    {
+                        text: "Herzlichen Glückwunsch zur Schwangerschaft! Das ist eine wundervolle, aber auch anspruchsvolle Zeit. Aus Sicherheitsgründen ist es wichtig zu erwähnen, dass unser Produkt KETO Balance während der Schwangerschaft nicht empfohlen wird.",
+                        next: "explain_contraindication",
+                        trustChange: 10
+                    },
+                    {
+                        text: "Schwanger? Dann kann ich Ihnen leider kein Abnehmprodukt anbieten.",
+                        next: "negative_reaction",
+                        trustChange: -10
+                    },
+                    {
+                        text: "Oh, herzlichen Glückwunsch! In der Schwangerschaft ist besondere Vorsicht geboten. Darf ich Ihnen stattdessen ein alternatives Produkt vorstellen?",
+                        next: "explain_contraindication_alt",
+                        trustChange: 8
+                    }
+                ]
+            },
+            explain_contraindication: {
+                text: "Sie: 'Die Inhaltsstoffe in KETO Balance sind nicht für die Anwendung während der Schwangerschaft geeignet, da ihre Wirkung auf das ungeborene Kind nicht ausreichend erforscht ist. Ihre Gesundheit und die Ihres Babys haben höchste Priorität.'",
+                customerResponse: {
+                    Neugierig: "Anna Herbst: 'Das verstehe ich. Aber die Gewichtszunahme macht mir wirklich Sorgen. Gibt es etwas, das ich tun kann?'",
+                    Hartnaeckig: "Anna Herbst: 'Das ist frustrierend! Ich hatte gehofft, endlich eine Lösung zu finden. Gibt es wirklich keine Alternative?'",
+                    Enttaeuscht: "Anna Herbst: 'Typisch! Immer wenn ich Hilfe brauche, gibt es Einschränkungen. Was soll ich denn jetzt machen?'"
+                },
+                next: "offer_alternative"
+            },
+            explain_contraindication_alt: {
+                text: "Sie: 'Während der Schwangerschaft ist besondere Vorsicht geboten. Unser KETO Balance Produkt enthält Inhaltsstoffe, die für das ungeborene Kind nicht geeignet sind. Ihre Sicherheit und die Ihres Babys stehen an erster Stelle.'",
+                customerResponse: {
+                    Neugierig: "Anna Herbst: 'Das ist verantwortungsvoll von Ihnen. Aber ich mache mir wirklich Sorgen um mein Gewicht. Haben Sie einen anderen Vorschlag?'",
+                    Hartnaeckig: "Anna Herbst: 'Immer diese Einschränkungen! Gibt es denn gar nichts, was ich tun kann?'",
+                    Enttaeuscht: "Anna Herbst: 'Schon wieder eine Enttäuschung. Ich hatte so gehofft...'"
+                },
+                next: "offer_alternative"
+            },
+            negative_reaction: {
+                text: {
+                    Neugierig: "Anna Herbst: 'Oh... verstehe. Dann ist das wohl nichts für mich.' *Click*",
+                    Hartnaeckig: "Anna Herbst: 'Das kann nicht Ihr Ernst sein! Ich brauche Hilfe!' *Click*",
+                    Enttaeuscht: "Anna Herbst: 'Wieder eine Enttäuschung...' *Click*"
+                },
+                type: "fail"
+            },
+            offer_alternative: {
+                text: "Sie: 'Ich verstehe Ihre Frustration vollkommen. Vielleicht kann ich Ihnen trotzdem helfen. Viele Schwangere berichten von Hautveränderungen während dieser besonderen Zeit. Darf ich Ihnen ein Produkt aus unserer Schönheitslinie vorstellen, das speziell für empfindliche Haut entwickelt wurde?'",
+                customerResponse: {
+                    Neugierig: "Anna Herbst: 'Oh, das ist interessant! Meine Haut ist tatsächlich trockener geworden und ich mache mir Sorgen wegen Dehnungsstreifen. Was haben Sie denn im Angebot?'",
+                    Hartnaeckig: "Anna Herbst: 'Nun, wenn ich schon nicht abnehmen kann, sollte ich wenigstens etwas für mein Hautbild tun. Erzählen Sie mir mehr.'",
+                    Enttaeuscht: "Anna Herbst: 'Na gut, was haben Sie denn? Meine Haut könnte wirklich etwas Pflege gebrauchen.'"
+                },
+                next: "present_cleartonix"
+            },
+            present_cleartonix: {
+                text: "Sie: 'Wir haben CLEARTONIX, ein spezielles Pflegeprodukt, das für empfindliche Haut entwickelt wurde. Es spendet intensive Feuchtigkeit, unterstützt die Hautbarriere und kann vorbeugend gegen Dehnungsstreifen wirken.'",
+                customerResponse: {
+                    Neugierig: "Anna Herbst: 'Das klingt vielversprechend. Was genau ist in der Formel enthalten und wie wendet man es an?'",
+                    Hartnaeckig: "Anna Herbst: 'Erzählen Sie mir mehr über die Wirkung. Ich will wissen, ob es wirklich hilft!'",
+                    Enttaeuscht: "Anna Herbst: 'Hmm, und das ist sicher in der Schwangerschaft? Ich will nichts riskieren.'"
+                },
+                next: "detail_cleartonix"
+            },
+            detail_cleartonix: {
+                text: "Sie: 'CLEARTONIX ist absolut unbedenklich in der Schwangerschaft. Es enthält eine spezielle Formel mit Avocadoöl, Panthenol, Sheabutter, Niacinamid und Hyaluronsäure, sowie Extrakte aus Ringelblume, Kamille, Aloe Vera und Sanddorn.'",
+                options: [
+                    {
+                        text: "Die Formel wirkt anti-aging, stimuliert die Kollagenproduktion, glättet Falten und beugt ihrer Entstehung vor. Zudem schützt sie die Haut vor vorzeitiger Alterung.",
+                        next: "application_info",
+                        trustChange: 5
+                    },
+                    {
+                        text: "Eine Tube mit 50 ml kostet 22€. Bei zweimal täglicher Anwendung reicht das für 10 Tage.",
+                        next: "price_focus",
+                        trustChange: -5
+                    },
+                    {
+                        text: "Das Produkt wurde dermatologisch getestet und ist besonders für empfindliche Haut in der Schwangerschaft geeignet.",
+                        next: "safety_info",
+                        trustChange: 3
+                    }
+                ]
+            },
+            application_info: {
+                text: "Sie: 'Die Anwendung ist denkbar einfach: morgens und abends auf die gereinigte Haut von Gesicht und Dekolleté auftragen. Viele Kundinnen berichten von spürbaren Verbesserungen bereits nach der ersten Woche - die Haut wirkt straffer und besser mit Feuchtigkeit versorgt.'",
+                customerResponse: {
+                    Neugierig: "Anna Herbst: 'Das klingt wirklich gut. Besonders die natürlichen Inhaltsstoffe gefallen mir. Wie sind Ihre Erfahrungen mit Schwangeren?'",
+                    Hartnaeckig: "Anna Herbst: 'Und wie schnell sehe ich Ergebnisse? Ich will keine Monate warten, bis sich etwas tut!'",
+                    Enttaeuscht: "Anna Herbst: 'Na gut, aber ich habe schon so viele Cremes ausprobiert, die nichts gebracht haben...'"
+                },
+                next: "address_concerns"
+            },
+            safety_info: {
+                text: "Sie: 'CLEARTONIX wurde speziell für empfindliche Haut entwickelt und ist dermatologisch getestet. Die Formel ist frei von Parabenen, Silikonen und synthetischen Duftstoffen, was es ideal für die Anwendung während der Schwangerschaft macht.'",
+                customerResponse: {
+                    Neugierig: "Anna Herbst: 'Das beruhigt mich. Die natürliche Zusammensetzung spricht mich sehr an. Wie wendet man es an?'",
+                    Hartnaeckig: "Anna Herbst: 'Gut, dass es ohne schädliche Zusatzstoffe ist. Aber bringt es auch was?'",
+                    Enttaeuscht: "Anna Herbst: 'Immerhin keine schädlichen Stoffe. Aber wirkt es auch?'"
+                },
+                next: "application_info"
+            },
+            price_focus: {
+                text: {
+                    Neugierig: "Anna Herbst: '22€ für so eine kleine Tube? Das ist mir zu teuer für ein Experiment.' *Click*",
+                    Hartnaeckig: "Anna Herbst: 'Das ist ja Wucher! Für den Preis erwarte ich sichtbare Resultate innerhalb weniger Tage!' *Click*",
+                    Enttaeuscht: "Anna Herbst: 'Immer diese überteuerten Produkte...' *Click*"
+                },
+                type: "fail"
+            },
+            address_concerns: {
+                text: "Wie reagieren Sie auf Annas Bedenken?",
+                options: [
+                    {
+                        text: "CLEARTONIX wurde speziell für empfindliche Haut entwickelt und ist dermatologisch getestet. Die Kombination von Hyaluronsäure mit natürlichen Ölen bietet sofortige und anhaltende Feuchtigkeit.",
+                        next: "success_approach",
+                        trustChange: 8
+                    },
+                    {
+                        text: "Die Wirkung ist wissenschaftlich belegt. Hyaluronsäure bindet bis zum 1000-fachen ihres Gewichts an Wasser, und Panthenol beruhigt nachweislich gereizte Haut.",
+                        next: "scientific_approach",
+                        trustChange: 6
+                    }
+                ]
+            },
+            scientific_approach: {
+                text: "Sie: 'Studien zeigen, dass die Kombination aus Hyaluronsäure und natürlichen Ölen die Hautbarriere innerhalb von 14 Tagen signifikant verbessern kann. Panthenol reduziert nachweislich Rötungen und Irritationen um bis zu 30%.'",
+                customerResponse: {
+                    Neugierig: "Anna Herbst: 'Wissenschaftliche Belege sind immer überzeugend. Das spricht mich an!'",
+                    Hartnaeckig: "Anna Herbst: 'Endlich mal Fakten statt leere Versprechungen! Das klingt vernünftig.'",
+                    Enttaeuscht: "Anna Herbst: 'Immerhin gibt es Studien. Das ist besser als nichts.'"
+                },
+                next: "success_approach"
+            },
+            success_approach: {
+                text: "Sie: 'Die spezielle Formel mit Panthenol und Niacinamid beruhigt die Haut und reduziert Rötungen, während Avocadoöl und Sheabutter intensive Pflege bieten. Die Extrakte aus Ringelblume und Kamille wirken entzündungshemmend. Viele Schwangere nutzen es besonders im Bauch- und Brustbereich, um die Haut auf die Dehnung vorzubereiten.'",
+                customerResponse: {
+                    Neugierig: "Anna Herbst: 'Das überzeugt mich! Besonders der Aspekt der Vorbeugung von Dehnungsstreifen interessiert mich. Können Sie mir eine Tube schicken?'",
+                    Hartnaeckig: "Anna Herbst: 'Endlich mal eine vernünftige Erklärung! Gut, ich probiere es aus. Aber ich erwarte Ergebnisse!'",
+                    Enttaeuscht: "Anna Herbst: 'Okay, ich bin zwar skeptisch, aber werde es versuchen. Meine Haut könnte wirklich etwas Zuwendung gebrauchen.'"
+                },
+                next: "closing_sale"
+            },
+            closing_sale: {
+                text: "Sie: 'Sehr gerne! Eine Tube CLEARTONIX mit 50 ml kostet 22€. Bei regelmäßiger Anwendung morgens und abends reicht eine Tube für etwa 10 Tage.'",
+                customerResponse: {
+                    Neugierig: "Anna Herbst: 'Perfekt! Bitte bestellen Sie mir eine Tube.'",
+                    Hartnaeckig: "Anna Herbst: 'Gut, dann schicken Sie mir zwei Tuben, dann habe ich gleich einen Vorrat.'",
+                    Enttaeuscht: "Anna Herbst: 'Na gut, ich bestelle eine Tube zum Ausprobieren.'"
+                },
+                next: "check_trust_for_shipping"
+            },
+            check_trust_for_shipping: {
+                text: "",
+                type: "decision",
+                decision: function() {
+                    if (state.Vertrauen >= 70) {
+                        return "shipping_info";
+                    } else {
+                        return "confirm_order_single";
+                    }
+                }
+            },
+            shipping_info: {
+                text: "Sie: 'Gerne! Übrigens: Bei Bestellungen ab 30€ ist der Versand kostenfrei. Bei einer Tube fallen noch 4,95€ Versandkosten an. Möchten Sie vielleicht zwei Tuben bestellen, um die Versandkosten zu sparen und länger von der Pflege zu profitieren?'",
+                customerResponse: {
+                    Neugierig: "Anna Herbst: 'Ach, das ist ein guter Punkt! Dann nehme ich gleich zwei Tuben. So spare ich Versandkosten und habe länger etwas von der Pflege.'",
+                    Hartnaeckig: "Anna Herbst: 'Warum sagen Sie das nicht gleich? Dann natürlich zwei! So umgehe ich die Versandkosten.'",
+                    Enttaeuscht: "Anna Herbst: 'Naja, wenn ich so schon spare... okay, zwei Tuben.'"
+                },
+                next: "confirm_order_double"
+            },
+            confirm_order_single: {
+                text: "Sie: 'Vielen Dank für Ihre Bestellung! Eine Tube CLEARTONIX macht 22€ plus 4,95€ Versandkosten, insgesamt 26,95€. Die Lieferung erfolgt innerhalb von 2-3 Werktagen.'",
+                next: "confirm_order_details_single"
+            },
+            confirm_order_details_single: {
+                text: "Sie: 'Da unser Versandpartner das Paket nur persönlich aushändigen darf: Passt der Zeitraum für Sie?'",
+                customerResponse: {
+                    Neugierig: "Anna Herbst: 'Ja, das passt. Danke der Nachfrage!'",
+                    Hartnaeckig: "Anna Herbst: 'Ja, sollte klappen. Die Lieferung sollte bitte pünktlich kommen.'",
+                    Enttaeuscht: "Anna Herbst: 'Ja, passt schon.'"
+                },
+                next: "final_confirmation_single"
+            },
+            final_confirmation_single: {
+                text: "Sie: 'Kann ich die Bestellung für Sie so aufgeben?'",
+                customerResponse: {
+                    Neugierig: "Anna Herbst: 'Ja, genau so. Vielen Dank!'",
+                    Hartnaeckig: "Anna Herbst: 'Ja, bitte erledigen Sie das.'",
+                    Enttaeuscht: "Anna Herbst: 'Ja, tun Sie das.'"
+                },
+                next: "order_complete_single"
+            },
+            order_complete_single: {
+                text: "Sie: 'Sehr gerne! Die Bestellung ist raus. Ich wünsche Ihnen alles Gute für Ihre Schwangerschaft und hoffe, dass CLEARTONIX Ihnen gefällt!'",
+                customerResponse: {
+                    Neugierig: "Anna Herbst: 'Vielen Dank für die nette Beratung! Auf Wiederhören.'",
+                    Hartnaeckig: "Anna Herbst: 'Danke. Auf Wiederhören.'",
+                    Enttaeuscht: "Anna Herbst: 'Danke. Auf Wiederhören.'"
+                },
+                type: "success"
+            },
+            confirm_order_double: {
+                text: "Sie: 'Vielen Dank für Ihre Bestellung! Zwei Tuben CLEARTONIX machen 44€, damit ist der Versand für Sie kostenfrei. Die Lieferung erfolgt innerhalb von 2-3 Werktagen.'",
+                next: "confirm_order_details_double"
+            },
+            confirm_order_details_double: {
+                text: "Sie: 'Da unser Versandpartner das Paket nur persönlich aushändigen darf: Passt der Zeitraum für Sie?'",
+                customerResponse: {
+                    Neugierig: "Anna Herbst: 'Ja, das passt. Danke der Nachfrage!'",
+                    Hartnaeckig: "Anna Herbst: 'Ja, sollte klappen. Die Lieferung sollte bitte pünktlich kommen.'",
+                    Enttaeuscht: "Anna Herbst: 'Ja, passt schon.'"
+                },
+                next: "final_confirmation_double"
+            },
+            final_confirmation_double: {
+                text: "Sie: 'Kann ich die Bestellung für Sie so aufgeben?'",
+                customerResponse: {
+                    Neugierig: "Anna Herbst: 'Ja, genau so. Vielen Dank!'",
+                    Hartnaeckig: "Anna Herbst: 'Ja, bitte erledigen Sie das.'",
+                    Enttaeuscht: "Anna Herbst: 'Ja, tun Sie das.'"
+                },
+                next: "order_complete_double"
+            },
+            order_complete_double: {
+                text: "Sie: 'Sehr gerne! Die Bestellung ist raus. Ich wünsche Ihnen alles Gute für Ihre Schwangerschaft und hoffe, dass CLEARTONIX Ihnen gefällt!'",
+                customerResponse: {
+                    Neugierig: "Anna Herbst: 'Vielen Dank für die nette Beratung! Auf Wiederhören.'",
+                    Hartnaeckig: "Anna Herbst: 'Danke. Auf Wiederhören.'",
+                    Enttaeuscht: "Anna Herbst: 'Danke. Auf Wiederhören.'"
+                },
+                type: "success"
+            }
+        };
+
+        // Helper function to highlight access codes
+        function highlightAccessCode(text) {
+            return text.replace(/Fenix-\d+/g, '<span class="highlight-code">$&</span>');
+        }
+
+        // Initialize the game
+        function initGame() {
+            startBtn.addEventListener('click', startGame);
+            call1Btn.addEventListener('click', () => selectCall('mueller'));
+            call2Btn.addEventListener('click', () => selectCall('herbst'));
+            nextBtn.addEventListener('click', proceedToNextScene);
+            retryBtn.addEventListener('click', retryScene);
+            restartBtn.addEventListener('click', restartGame);
+        }
+
+        // Start the game
+        function startGame() {
+            state.agentName = agentNameInput.value.trim() || "Operator";
+            state.Verkäufe = 0;
+            state.Vertrauen = 50;
+            state.Kundentyp = "Neugierig";
+            state.currentScene = "intro";
+            state.previousScenes = [];
+            state.knowsPregnant = false;
+            state.currentCall = null;
+            state.codes = [];
+
+            introScreen.classList.add('hidden');
+            callSelection.classList.remove('hidden');
+            gameScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+        }
+
+        // Select call type
+        function selectCall(callType) {
+            state.currentCall = callType;
+            state.Vertrauen = 50;
+            state.Kundentyp = "Neugierig";
+            state.currentScene = "intro";
+            state.previousScenes = [];
+            state.knowsPregnant = false;
+
+            callSelection.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+
+            if (callType === 'mueller') {
+                chapterTitle.textContent = "Anruf №1: E. Müller";
+            } else {
+                chapterTitle.textContent = "Anruf №2: Anna Herbst";
+            }
+
+            updateIndicators();
+            loadScene(state.currentScene);
+        }
+
+        // Update scenes with the agent's name
+        function updateScenesWithAgentName() {
+            for (const sceneKey in scenes) {
+                if (scenes[sceneKey].text && typeof scenes[sceneKey].text === 'string') {
+                    scenes[sceneKey].text = scenes[sceneKey].text.replace("[Name]", state.agentName);
+                } else if (scenes[sceneKey].text && typeof scenes[sceneKey].text === 'object') {
+                    for (const mood in scenes[sceneKey].text) {
+                        scenes[sceneKey].text[mood] = scenes[sceneKey].text[mood].replace("[Name]", state.agentName);
+                    }
+                }
+                
+                if (scenes[sceneKey].customerResponse && typeof scenes[sceneKey].customerResponse === 'object') {
+                    for (const mood in scenes[sceneKey].customerResponse) {
+                        scenes[sceneKey].customerResponse[mood] = scenes[sceneKey].customerResponse[mood].replace("[Name]", state.agentName);
+                    }
+                }
+                
+                if (scenes[sceneKey].options) {
+                    scenes[sceneKey].options.forEach(option => {
+                        option.text = option.text.replace("[Name]", state.agentName);
+                    });
+                }
+            }
+        }
+
+        // Update indicators display
+        function updateIndicators() {
+            trustValue.textContent = state.Vertrauen;
+            salesValue.textContent = state.Verkäufe;
+            moodValue.textContent = state.Kundentyp;
+            
+            // Color code trust value
+            if (state.Vertrauen > 50) {
+                trustValue.className = 'indicator-value trust-up';
+            } else if (state.Vertrauen < 50) {
+                trustValue.className = 'indicator-value trust-down';
+            } else {
+                trustValue.className = 'indicator-value';
+            }
+        }
+
+        // Load a scene
+        function loadScene(sceneKey) {
+            const scenes = state.currentCall === 'mueller' ? muellerScenes : herbstScenes;
+            const scene = scenes[sceneKey];
+            if (!scene) {
+                addDialogMessage('system', `Szene nicht gefunden: ${sceneKey}`);
+                return;
+            }
+            state.previousScenes.push(state.currentScene);
+            state.currentScene = sceneKey;
+            
+            // Clear containers
+            dialogContainer.innerHTML = '';
+            optionsContainer.innerHTML = '';
+            nextBtn.classList.add('hidden');
+            retryBtn.classList.add('hidden');
+            
+            // Add scene text to dialog
+            let sceneText = '';
+            if (typeof scene.text === 'object') {
+                sceneText = scene.text[state.Kundentyp] || scene.text.Neugierig;
+            } else {
+                sceneText = scene.text;
+            }
+            addDialogMessage('system', sceneText);
+            
+            // Handle different scene types
+            if (scene.type === 'fail') {
+                addDialogMessage('customer', 'Das Ende: Anruf gescheitert.');
+                retryBtn.classList.remove('hidden');
+            } else if (scene.type === 'decision' && typeof scene.decision === 'function') {
+                // Compute the next scene dynamically
+                const nextKey = scene.decision();
+                if (nextKey) {
+                    setTimeout(() => loadScene(nextKey), 500);
+                } else {
+                    addDialogMessage('system', 'Entscheidungszweig nicht definiert.');
+                }
+            } else if (scene.type === 'success') {
+                state.Verkäufe += 1;
+                updateIndicators();
+                
+                const code = state.currentCall === 'mueller' ? 'Fenix-375' : 'Fenix-813';
+                state.codes.push(code);
+                
+                setTimeout(() => {
+                    gameScreen.classList.add('hidden');
+                    resultScreen.classList.remove('hidden');
+                    finalCode.textContent = code;
+                }, 2000);
+            } else if (scene.customerResponse) {
+                let responseText = '';
+                if (typeof scene.customerResponse === 'object') {
+                    responseText = scene.customerResponse[state.Kundentyp] || scene.customerResponse.Neugierig;
+                } else {
+                    responseText = scene.customerResponse;
+                }
+                addDialogMessage('customer', responseText);
+                // After the customer's response, either show options or reveal Next
+                setTimeout(() => {
+                    if (scene.options && Array.isArray(scene.options) && scene.options.length) {
+                        showOptions(scene.options);
+                    } else if (scene.next) {
+                        // Show Next as a clear, manual progression control so content isn't skipped
+                        nextBtn.classList.remove('hidden');
+                    }
+                }, 800);
+            } else if (scene.options) {
+                showOptions(scene.options);
+            } else if (scene.next) {
+                nextBtn.classList.remove('hidden');
+            }
+        }
+
+        // Add a message to the dialog
+        function addDialogMessage(sender, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender);
+            
+            // Add mood indicator for customer messages
+            if (sender === 'customer') {
+                const moodSpan = document.createElement('span');
+                moodSpan.classList.add('mood-indicator', state.Kundentyp.toLowerCase());
+                moodSpan.textContent = state.Kundentyp;
+                messageDiv.innerHTML = highlightAccessCode(text) + ' ';
+                messageDiv.appendChild(moodSpan);
+            } else {
+                messageDiv.innerHTML = highlightAccessCode(text);
+            }
+            
+            dialogContainer.appendChild(messageDiv);
+            dialogContainer.scrollTop = dialogContainer.scrollHeight;
+        }
+
+        // Show options for the player
+        function showOptions(options) {
+            options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.classList.add('choice-button');
+                button.textContent = option.text;
+                button.addEventListener('click', () => selectOption(option));
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        // Handle option selection
+        function selectOption(option) {
+            // Add player's choice to dialog
+            addDialogMessage('operator', option.text);
+            
+            // Update trust
+            if (option.trustChange) {
+                const oldTrust = state.Vertrauen;
+                state.Vertrauen += option.trustChange;
+                
+                // Ensure trust stays within bounds (0-100)
+                state.Vertrauen = Math.max(0, Math.min(100, state.Vertrauen));
+                
+                // Add trust change message
+                const trustChangeMsg = document.createElement('div');
+                trustChangeMsg.classList.add('message', 'system');
+                trustChangeMsg.innerHTML = `Vertrauen ${option.trustChange > 0 ? '+' : ''}${option.trustChange}`;
+                dialogContainer.appendChild(trustChangeMsg);
+                
+                updateIndicators();
+            }
+            
+            // Update customer mood based on trust level and option chosen
+            updateCustomerMood(option);
+            
+            // Clear options
+            optionsContainer.innerHTML = '';
+            
+            // Handle next scene
+            if (option.next) {
+                if (typeof option.next === 'string') {
+                    setTimeout(() => loadScene(option.next), 1000);
+                } else {
+                    // Handle mood-based next scenes
+                    const nextScene = option.next[state.Kundentyp];
+                    setTimeout(() => loadScene(nextScene), 1000);
+                }
+            }
+        }
+
+        // Update customer mood based on trust and responses
+        function updateCustomerMood(option) {
+            // Mood changes based on trust level and the nature of the response
+            if (option.trustChange < 0) {
+                // Negative responses increase chance of negative moods
+                const moodChange = Math.random();
+                if (state.currentCall === 'mueller') {
+                    if (moodChange < 0.4 && state.Kundentyp !== "Genervt") {
+                        state.Kundentyp = "Genervt";
+                    } else if (moodChange < 0.7 && state.Kundentyp !== "Ungläubig") {
+                        state.Kundentyp = "Ungläubig";
+                    }
+                } else { // herbst call
+                    if (moodChange < 0.4 && state.Kundentyp !== "Enttaeuscht") {
+                        state.Kundentyp = "Enttaeuscht";
+                    } else if (moodChange < 0.7 && state.Kundentyp !== "Hartnaeckig") {
+                        state.Kundentyp = "Hartnaeckig";
+                    }
+                }
+            } else if (option.trustChange > 5) {
+                // Very positive responses make customer more curious
+                const moodChange = Math.random();
+                if (moodChange < 0.6) {
+                    if (state.currentCall === 'mueller') {
+                        state.Kundentyp = "Neugierig";
+                    } else {
+                        state.Kundentyp = "Neugierig";
+                    }
+                }
+            }
+            
+            // Update mood display
+            moodValue.textContent = state.Kundentyp;
+        }
+
+        // Proceed to the next scene
+        function proceedToNextScene() {
+            const scenes = state.currentCall === 'mueller' ? muellerScenes : herbstScenes;
+            const scene = scenes[state.currentScene];
+            if (scene && scene.next) {
+                loadScene(scene.next);
+            }
+        }
+
+        // Retry the current scene
+        function retryScene() {
+            // Go back to the previous scene before the failure
+            if (state.previousScenes.length > 1) {
+                state.currentScene = state.previousScenes[state.previousScenes.length - 2];
+                state.previousScenes = state.previousScenes.slice(0, -1);
+                
+                // Slightly reduce trust on retry
+                state.Vertrauen = Math.max(0, state.Vertrauen - 5);
+                updateIndicators();
+                
+                loadScene(state.currentScene);
+            } else {
+                // If no previous scenes, restart the call
+                selectCall(state.currentCall);
+            }
+        }
+
+        // Restart the game
+        function restartGame() {
+            gameScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            callSelection.classList.remove('hidden');
+        }
+
+        // Initialize the game when the page loads
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
